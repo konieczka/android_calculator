@@ -7,7 +7,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 
-public class SimpleActivity extends AppCompatActivity {
+public class AdvancedActivity extends AppCompatActivity {
     private Button button0;
     private Button button1;
     private Button button2;
@@ -26,6 +26,15 @@ public class SimpleActivity extends AppCompatActivity {
     private Button buttonPoint;
     private Button buttonEquals;
 
+    private Button buttonSin;
+    private Button buttonCos;
+    private Button buttonTan;
+    private Button buttonLn;
+    private Button buttonSqrt;
+    private Button buttonPower2;
+    private Button buttonPower;
+    private Button buttonLog;
+
     private Button buttonBackspace;
     private Button buttonClear;
     private Button buttonChangeSign;
@@ -34,8 +43,6 @@ public class SimpleActivity extends AppCompatActivity {
     private TextView registryView;
 
     private double currentResultDouble = 0;
-    private int currentResultInt = 0;
-    private boolean floatingPoint = false;
     private boolean firstOp = true;
     private boolean displayingResult = false;
 
@@ -44,13 +51,14 @@ public class SimpleActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_simple);
+        setContentView(R.layout.activity_advanced);
         bindUIButtons();
         bindUIViews();
 
         setNumerButtonsOnClickListeners();
         setInputManagementButtonsOnClickListeners();
         setOperationsButtonsOnClickListeners();
+        setFunctionsButtonsOnClickListeners();
 
     }
 
@@ -62,45 +70,10 @@ public class SimpleActivity extends AppCompatActivity {
         currentInputView.setText(currentInputView.getText() + String.valueOf(digit));
     }
 
-    private void switchToDouble(){
-        currentResultDouble = currentResultInt;
-        floatingPoint = true;
-    }
-
-    private void performOperationInt(char op){
-        int inputNumber = Integer.valueOf((String) currentInputView.getText());
-
-        if (firstOp) {
-            currentResultInt = inputNumber;
-            return;
-        }
-
-        switch (op){
-            case '-':
-                currentResultInt -= inputNumber;
-                break;
-            case '/':
-                if (currentResultInt % inputNumber == 0){
-                    currentResultInt /= inputNumber;
-                }
-                else {
-                    switchToDouble();
-                    currentResultDouble /= inputNumber;
-                }
-                break;
-            case '*':
-                currentResultInt *= inputNumber;
-                break;
-            default:
-                currentResultInt += inputNumber;
-                break;
-        }
-    }
-
     private void performOperationDouble(char op){
         double inputNumber = Double.valueOf((String) currentInputView.getText());
 
-        if (firstOp) {
+        if (firstOp & "scntrp".indexOf(op) == -1) {
             currentResultDouble = inputNumber;
             return;
         }
@@ -115,6 +88,54 @@ public class SimpleActivity extends AppCompatActivity {
             case '*':
                 currentResultDouble *= inputNumber;
                 break;
+            case 's': // Sinus
+                currentInputView.setText(Double.toString(Math.sin(inputNumber)));
+
+                if (displayingResult){
+                    currentResultDouble = Math.sin(inputNumber);
+                }
+                break;
+            case 'c': // Cosinus
+                currentInputView.setText(Double.toString(Math.cos(inputNumber)));
+
+                if (displayingResult){
+                    currentResultDouble = Math.cos(inputNumber);
+                }
+                break;
+            case 't': // Tangens
+                currentInputView.setText(Double.toString(Math.tan(inputNumber)));
+
+                if (displayingResult){
+                    currentResultDouble = Math.tan(inputNumber);
+                }
+                break;
+            case 'n': // Natural logarithm
+                currentInputView.setText(Double.toString(Math.log(inputNumber)));
+
+                if (displayingResult){
+                    currentResultDouble = Math.log(inputNumber);
+                }
+                break;
+            case 'r': // Square root
+                currentInputView.setText(Double.toString(Math.sqrt(inputNumber)));
+
+                if (displayingResult){
+                    currentResultDouble = Math.sqrt(inputNumber);
+                }
+                break;
+            case 'p': // Power of two
+                currentInputView.setText(Double.toString(Math.pow(inputNumber, 2)));
+
+                if (displayingResult){
+                    currentResultDouble = Math.pow(inputNumber, 2);
+                }
+                break;
+            case 'q': // Power of y
+                currentResultDouble = Math.pow(currentResultDouble, inputNumber);
+                break;
+            case 'l': // Logarithm
+                currentResultDouble = Math.log(currentResultDouble) / Math.log(inputNumber);
+                break;
             default:
                 currentResultDouble += inputNumber;
                 break;
@@ -122,7 +143,7 @@ public class SimpleActivity extends AppCompatActivity {
     }
 
     private void validateOperation(char op){
-        if (displayingResult){
+        if (displayingResult && "scntrp".indexOf(op) == -1){
             currentInputView.setText("");
             displayingResult = false;
         }
@@ -135,59 +156,50 @@ public class SimpleActivity extends AppCompatActivity {
                 return;
             }
 
-            if (!floatingPoint && currentInput.indexOf('.') > 0){
-                switchToDouble();
-            }
-
-            if (floatingPoint){
+            if ("scntrp".indexOf(op) == -1){
                 performOperationDouble(lastOp);
             }
-            else {
-                performOperationInt(lastOp);
+            else{
+                performOperationDouble(op);
             }
         }
 
         if (firstOp) firstOp = false;
 
-        lastOp = op;
-        currentInputView.setText("");
+        registryView.setText(Double.toString(currentResultDouble));
 
-        if (floatingPoint){
-            registryView.setText(Double.toString(currentResultDouble));
+        if ("scntrp".indexOf(op) == -1){
+            lastOp = op;
+            currentInputView.setText("");
+        }
+
+        if (op == 'q'){
+            registryView.setText(registryView.getText() + "^");
+        }
+        else if (op == 'l'){
+            registryView.setText(registryView.getText() + " " + "log");
+        }
+        else if ("scntrp".indexOf(op) != -1){
+            registryView.setText(registryView.getText());
         }
         else {
-            registryView.setText(Integer.toString(currentResultInt));
+            registryView.setText(registryView.getText() + " " + lastOp);
         }
-
-        registryView.setText(registryView.getText() + " " + lastOp);
     }
 
     private void finalizeResult(){
-        if (floatingPoint){
-            validateOperation(lastOp);
-        }
-        else{
-            validateOperation(lastOp);
-        }
+        validateOperation(lastOp);
 
-        if (floatingPoint){
-            currentInputView.setText(Double.toString(currentResultDouble));
-            registryView.setText(Double.toString(currentResultDouble));
-        }
-        else{
-            currentInputView.setText(Integer.toString(currentResultInt));
-            registryView.setText(Integer.toString(currentResultInt));
-        }
+        currentInputView.setText(Double.toString(currentResultDouble));
+        registryView.setText(Double.toString(currentResultDouble));
 
         displayingResult = true;
     }
 
     private void reset(){
         currentResultDouble = 0;
-        currentResultInt = 0;
         firstOp = true;
         lastOp = '+';
-        floatingPoint = true;
         displayingResult = false;
         registryView.setText("0");
     }
@@ -211,6 +223,15 @@ public class SimpleActivity extends AppCompatActivity {
         buttonPoint = (Button) findViewById(R.id.buttonPoint);
         buttonEquals = (Button) findViewById(R.id.buttonEquals);
 
+        buttonSin = (Button) findViewById(R.id.buttonSin);
+        buttonCos = (Button) findViewById(R.id.buttonCos);
+        buttonTan = (Button) findViewById(R.id.buttonTan);
+        buttonLn = (Button) findViewById(R.id.buttonLn);
+        buttonSqrt = (Button) findViewById(R.id.buttonSqrt);
+        buttonPower2 = (Button) findViewById(R.id.buttonPower2);
+        buttonPower = (Button) findViewById(R.id.buttonPower);
+        buttonLog = (Button) findViewById(R.id.buttonLog);
+
         buttonBackspace = (Button) findViewById(R.id.buttonBackspace);
         buttonClear = (Button) findViewById(R.id.buttonClear);
         buttonChangeSign = (Button) findViewById(R.id.buttonChangeSign);
@@ -219,6 +240,65 @@ public class SimpleActivity extends AppCompatActivity {
     private void bindUIViews(){
         currentInputView = (TextView) findViewById(R.id.currentInputView);
         registryView = (TextView) findViewById(R.id.registryView);
+    }
+
+
+    private void setFunctionsButtonsOnClickListeners(){
+        buttonSin.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                validateOperation('s');
+            }
+        });
+
+        buttonCos.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                validateOperation('c');
+            }
+        });
+
+        buttonTan.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                validateOperation('t');
+            }
+        });
+
+        buttonLn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                validateOperation('n');
+            }
+        });
+
+        buttonSqrt.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                validateOperation('r');
+            }
+        });
+
+        buttonPower2.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                validateOperation('p');
+            }
+        });
+
+        buttonPower.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                validateOperation('q');
+            }
+        });
+
+        buttonLog.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                validateOperation('l');
+            }
+        });
     }
 
     private void setOperationsButtonsOnClickListeners(){
@@ -232,7 +312,7 @@ public class SimpleActivity extends AppCompatActivity {
         buttonSubtract.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                 validateOperation('-');
+                validateOperation('-');
             }
         });
 
