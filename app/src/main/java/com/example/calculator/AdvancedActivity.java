@@ -157,6 +157,12 @@ public class AdvancedActivity extends AppCompatActivity {
     }
 
     private void validateOperation(char op){
+        if (currentInputView.getText().length() == 0 && "scntrpl".indexOf(op) != -1){
+            currentInputView.setText("You have to input a number to do that operation!");
+            displayingResult = true;
+            return;
+        }
+
         // Validate if user's intention is to change operation
         if (currentInputView.getText().length() == 0){
             lastOp = op;
@@ -210,9 +216,6 @@ public class AdvancedActivity extends AppCompatActivity {
 
           if (op == 'q'){
               registryView.setText(registryView.getText() + "^");
-          }
-          else if ("scntrpl".indexOf(op) != -1){
-              registryView.setText(registryView.getText());
           }
           else {
               registryView.setText(registryView.getText() + " " + lastOp);
