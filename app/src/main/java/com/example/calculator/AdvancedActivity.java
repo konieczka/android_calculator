@@ -60,6 +60,9 @@ public class AdvancedActivity extends AppCompatActivity {
         setOperationsButtonsOnClickListeners();
         setFunctionsButtonsOnClickListeners();
 
+        if (savedInstanceState != null) {
+            restoreState(savedInstanceState);
+        }
     }
 
     private void onDigitInput(int digit){
@@ -466,5 +469,26 @@ public class AdvancedActivity extends AppCompatActivity {
                 onDigitInput(9);
             }
         });
+    }
+
+    protected void onSaveInstanceState(Bundle state) {
+        super.onSaveInstanceState(state);
+        state.putDouble("currentResultDouble", currentResultDouble);
+        state.putBoolean("firstOp", firstOp);
+        state.putBoolean("displayingResult", displayingResult);
+        state.putChar("lastOp", lastOp);
+
+        state.putString("currentInput", (String) currentInputView.getText());
+        state.putString("currentRegistry", (String) registryView.getText());
+    }
+
+    private void restoreState(Bundle state){
+        currentResultDouble = state.getDouble("currentResultDouble");
+        firstOp = state.getBoolean("firstOp");
+        displayingResult = state.getBoolean("displayingResult");
+        lastOp = state.getChar("lastOp");
+
+        currentInputView.setText(state.getString("currentInput"));
+        registryView.setText(state.getString("currentRegistry"));
     }
 }

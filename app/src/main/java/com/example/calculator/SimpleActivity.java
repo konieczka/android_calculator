@@ -52,6 +52,9 @@ public class SimpleActivity extends AppCompatActivity {
         setInputManagementButtonsOnClickListeners();
         setOperationsButtonsOnClickListeners();
 
+        if (savedInstanceState != null) {
+            restoreState(savedInstanceState);
+        }
     }
 
     private void onDigitInput(int digit){
@@ -386,5 +389,30 @@ public class SimpleActivity extends AppCompatActivity {
                 onDigitInput(9);
             }
         });
+    }
+
+    protected void onSaveInstanceState(Bundle state) {
+        super.onSaveInstanceState(state);
+        state.putInt("currentResultInt", currentResultInt);
+        state.putDouble("currentResultDouble", currentResultDouble);
+        state.putBoolean("floatingPoint", floatingPoint);
+        state.putBoolean("firstOp", firstOp);
+        state.putBoolean("displayingResult", displayingResult);
+        state.putChar("lastOp", lastOp);
+
+        state.putString("currentInput", (String) currentInputView.getText());
+        state.putString("currentRegistry", (String) registryView.getText());
+    }
+
+    private void restoreState(Bundle state){
+        currentResultInt = state.getInt("currentResultInt");
+        currentResultDouble = state.getDouble("currentResultDouble");
+        floatingPoint = state.getBoolean("floatingPoint");
+        firstOp = state.getBoolean("firstOp");
+        displayingResult = state.getBoolean("displayingResult");
+        lastOp = state.getChar("lastOp");
+
+        currentInputView.setText(state.getString("currentInput"));
+        registryView.setText(state.getString("currentRegistry"));
     }
 }
