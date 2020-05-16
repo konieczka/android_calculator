@@ -84,7 +84,7 @@ public class AdvancedActivity extends AppCompatActivity {
     private void performOperationDouble(char op){
         double inputNumber = Double.valueOf((String) currentInputView.getText());
 
-        if (firstOp & "scntrp".indexOf(op) == -1) {
+        if (firstOp & "scntrpl".indexOf(op) == -1) {
             currentResultDouble = inputNumber;
             return;
         }
@@ -144,9 +144,12 @@ public class AdvancedActivity extends AppCompatActivity {
             case 'q': // Power of y
                 currentResultDouble = Math.pow(currentResultDouble, inputNumber);
                 break;
-            case 'l': // Logarithm
-                currentResultDouble = Math.log(currentResultDouble) / Math.log(inputNumber);
-                break;
+            case 'l': // Decimal logarithm
+                currentInputView.setText(Double.toString(Math.log(inputNumber)));
+
+                if (displayingResult){
+                    currentResultDouble = Math.log10(inputNumber);
+                }
             default:
                 currentResultDouble += inputNumber;
                 break;
@@ -154,54 +157,67 @@ public class AdvancedActivity extends AppCompatActivity {
     }
 
     private void validateOperation(char op){
-        if (displayingResult && "scntrp".indexOf(op) == -1){
+        if (displayingResult && "scntrpl".indexOf(op) == -1){
             currentInputView.setText("");
             displayingResult = false;
-        }
-        else{
-            String currentInput = (String) currentInputView.getText();
 
-            if (currentInput.length() == 0){
-                currentInputView.setText("Invalid input");
-                displayingResult = true;
-                return;
-            }
-
-            if (Double.parseDouble((String) currentInputView.getText()) == 0 && lastOp == '/'){
-                currentInputView.setText("You can't divide by zero!");
-                displayingResult = true;
-                return;
-            }
-
-            if ("scntrp".indexOf(op) == -1){
-                performOperationDouble(lastOp);
-            }
-            else{
-                performOperationDouble(op);
-            }
+            return;
         }
 
-        if (firstOp) firstOp = false;
+      try {
+          String currentInput = (String) currentInputView.getText();
 
-        registryView.setText(Double.toString(currentResultDouble));
+          if (currentInput.length() == 0){
+              currentInputView.setText("Invalid input");
+              displayingResult = true;
+              return;
+          }
 
-        if ("scntrp".indexOf(op) == -1){
-            lastOp = op;
-            currentInputView.setText("");
-        }
+          if (Double.parseDouble((String) currentInputView.getText()) == 0 && lastOp == '/'){
+              currentInputView.setText("You can't divide by zero!");
+              displayingResult = true;
+              return;
+          }
 
-        if (op == 'q'){
-            registryView.setText(registryView.getText() + "^");
-        }
-        else if (op == 'l'){
-            registryView.setText(registryView.getText() + " " + "log");
-        }
-        else if ("scntrp".indexOf(op) != -1){
-            registryView.setText(registryView.getText());
-        }
-        else {
-            registryView.setText(registryView.getText() + " " + lastOp);
-        }
+          if (Double.parseDouble((String) currentInputView.getText()) <= 0 && "nl".indexOf(op) != -1){
+              currentInputView.setText("Logarithm argument must be greater than zero!");
+              displayingResult = true;
+              return;
+          }
+
+          if ("scntrpl".indexOf(op) == -1){
+              performOperationDouble(lastOp);
+          }
+          else{
+              performOperationDouble(op);
+          }
+
+          if (firstOp) firstOp = false;
+
+          registryView.setText(Double.toString(currentResultDouble));
+
+          if ("scntrpl".indexOf(op) == -1){
+              lastOp = op;
+              currentInputView.setText("");
+          }
+
+          if (op == 'q'){
+              registryView.setText(registryView.getText() + "^");
+          }
+          else if (op == 'l'){
+              registryView.setText(registryView.getText() + " " + "log");
+          }
+          else if ("scntrpl".indexOf(op) != -1){
+              registryView.setText(registryView.getText());
+          }
+          else {
+              registryView.setText(registryView.getText() + " " + lastOp);
+          }
+      } catch (NumberFormatException e){
+          currentInputView.setText("Invalid input");
+          displayingResult = true;
+          return;
+      }
     }
 
     private void finalizeResult(){
