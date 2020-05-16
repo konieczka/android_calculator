@@ -23,15 +23,15 @@
 
     <TextView
         android:id="@+id/currentInputView"
-        android:layout_width="360dp"
-        android:layout_height="132dp"
+        android:layout_width="392dp"
+        android:layout_height="140dp"
         android:layout_below="@+id/registryView"
         android:gravity="right"
         android:paddingLeft="10sp"
         android:paddingTop="5sp"
         android:paddingRight="20sp"
         android:textAppearance="@style/TextAppearance.AppCompat.Body1"
-        android:textSize="60sp"
+        android:textSize="50sp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.0"

@@ -70,6 +70,14 @@ public class AdvancedActivity extends AppCompatActivity {
             currentInputView.setText("");
             displayingResult = false;
         }
+
+        String currentInput = (String) currentInputView.getText();
+
+        if (currentInput.length() > 0 && Double.parseDouble(currentInput) == 0){
+            currentInputView.setText(String.valueOf(digit));
+
+            return;
+        }
         currentInputView.setText(currentInputView.getText() + String.valueOf(digit));
     }
 
@@ -159,6 +167,12 @@ public class AdvancedActivity extends AppCompatActivity {
                 return;
             }
 
+            if (Double.parseDouble((String) currentInputView.getText()) == 0 && lastOp == '/'){
+                currentInputView.setText("You can't divide by zero!");
+                displayingResult = true;
+                return;
+            }
+
             if ("scntrp".indexOf(op) == -1){
                 performOperationDouble(lastOp);
             }
@@ -191,6 +205,12 @@ public class AdvancedActivity extends AppCompatActivity {
     }
 
     private void finalizeResult(){
+        if (Double.parseDouble((String) currentInputView.getText()) == 0 && lastOp == '/'){
+            currentInputView.setText("You can't divide by zero!");
+            displayingResult = true;
+            return;
+        }
+
         validateOperation(lastOp);
 
         currentInputView.setText(Double.toString(currentResultDouble));
@@ -401,9 +421,7 @@ public class AdvancedActivity extends AppCompatActivity {
         button0.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (!(currentInputView.getText().length() == 0)){
-                    onDigitInput(0);
-                }
+                onDigitInput(0);
             }
         });
 
