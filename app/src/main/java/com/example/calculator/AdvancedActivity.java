@@ -157,40 +157,47 @@ public class AdvancedActivity extends AppCompatActivity {
     }
 
     private void validateOperation(char op){
-        if (displayingResult && "scntrpl".indexOf(op) == -1){
-            currentInputView.setText("");
-            displayingResult = false;
+        // Validate if user's intention is to change operation
+        if (currentInputView.getText().length() == 0){
+            lastOp = op;
+
+            registryView.setText(currentResultDouble + " " + lastOp);
 
             return;
         }
 
       try {
-          String currentInput = (String) currentInputView.getText();
+          if (displayingResult && "scntrpl".indexOf(op) == -1){
+              currentInputView.setText("");
+              displayingResult = false;
 
-          if (currentInput.length() == 0){
-              currentInputView.setText("Invalid input");
-              displayingResult = true;
-              return;
-          }
+          } else {
+              String currentInput = (String) currentInputView.getText();
 
-          if (Double.parseDouble((String) currentInputView.getText()) == 0 && lastOp == '/'){
-              currentInputView.setText("You can't divide by zero!");
-              displayingResult = true;
-              return;
-          }
+              if (currentInput.length() == 0){
+                  currentInputView.setText("Invalid input");
+                  displayingResult = true;
+                  return;
+              }
 
-          if (Double.parseDouble((String) currentInputView.getText()) <= 0 && "nl".indexOf(op) != -1){
-              currentInputView.setText("Logarithm argument must be greater than zero!");
-              displayingResult = true;
-              return;
-          }
+              if (Double.parseDouble((String) currentInputView.getText()) == 0 && lastOp == '/'){
+                  currentInputView.setText("You can't divide by zero!");
+                  displayingResult = true;
+                  return;
+              }
 
-          if ("scntrpl".indexOf(op) == -1){
-              performOperationDouble(lastOp);
-          }
-          else{
-              performOperationDouble(op);
-          }
+              if (Double.parseDouble((String) currentInputView.getText()) <= 0 && "nl".indexOf(op) != -1){
+                  currentInputView.setText("Logarithm argument must be greater than zero!");
+                  displayingResult = true;
+                  return;
+              }
+
+              if ("scntrpl".indexOf(op) == -1){
+                  performOperationDouble(lastOp);
+              }
+              else{
+                  performOperationDouble(op);
+              }}
 
           if (firstOp) firstOp = false;
 
@@ -203,9 +210,6 @@ public class AdvancedActivity extends AppCompatActivity {
 
           if (op == 'q'){
               registryView.setText(registryView.getText() + "^");
-          }
-          else if (op == 'l'){
-              registryView.setText(registryView.getText() + " " + "log");
           }
           else if ("scntrpl".indexOf(op) != -1){
               registryView.setText(registryView.getText());
@@ -221,8 +225,14 @@ public class AdvancedActivity extends AppCompatActivity {
     }
 
     private void finalizeResult(){
-        if (Double.parseDouble((String) currentInputView.getText()) == 0 && lastOp == '/'){
-            currentInputView.setText("You can't divide by zero!");
+        try {
+            if (Double.parseDouble((String) currentInputView.getText()) == 0 && lastOp == '/'){
+                currentInputView.setText("You can't divide by zero!");
+                displayingResult = true;
+                return;
+            }
+        } catch (NumberFormatException e) {
+            currentInputView.setText("Invalid input");
             displayingResult = true;
             return;
         }

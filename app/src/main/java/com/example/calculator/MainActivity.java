@@ -35,6 +35,22 @@ public class MainActivity extends AppCompatActivity {
                 startActivity(goToSimple);
             }
         });
+
+        buttonAbout.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent goToSimple = new Intent(MainActivity.this, AboutActivity.class);
+                startActivity(goToSimple);
+            }
+        });
+
+        buttonExit.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                MainActivity.this.finish();
+                System.exit(0);
+            }
+        });
     }
 
     private void bindMenuButtons(){

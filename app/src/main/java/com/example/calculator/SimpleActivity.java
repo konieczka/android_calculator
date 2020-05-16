@@ -133,55 +133,82 @@ public class SimpleActivity extends AppCompatActivity {
     }
 
     private void validateOperation(char op){
-        if (displayingResult){
-            currentInputView.setText("");
-            displayingResult = false;
+        // Validate if user's intention is to change sign
+        if (currentInputView.getText().length() == 0){
+            lastOp = op;
+
+            if (floatingPoint){
+                registryView.setText(currentResultDouble + " " + lastOp);
+            }
+            else {
+                registryView.setText(currentResultInt + " " + lastOp);
+            }
+
+            return;
         }
-        else{
-            String currentInput = (String) currentInputView.getText();
 
-            if (currentInput.length() == 0){
-                currentInputView.setText("Invalid input");
-                displayingResult = true;
-                return;
+        try {
+            if (displayingResult){
+                currentInputView.setText("");
+                displayingResult = false;
+
+            }
+            else{
+                String currentInput = (String) currentInputView.getText();
+
+                if (currentInput.length() == 0){
+                    currentInputView.setText("Invalid input");
+                    displayingResult = true;
+                    return;
+                }
+
+                if (!floatingPoint && currentInput.indexOf('.') > 0){
+                    switchToDouble();
+                }
+
+                if (Double.parseDouble(currentInput) == 0 && lastOp == '/'){
+                    currentInputView.setText("You can't divide by zero!");
+                    displayingResult = true;
+                    return;
+                }
+
+                if (floatingPoint){
+                    performOperationDouble(lastOp);
+                }
+                else {
+                    performOperationInt(lastOp);
+                }
             }
 
-            if (!floatingPoint && currentInput.indexOf('.') > 0){
-                switchToDouble();
+            if (firstOp) firstOp = false;
+
+            lastOp = op;
+            currentInputView.setText("");
+
+            if (floatingPoint){
+                registryView.setText(Double.toString(currentResultDouble));
+            }
+            else {
+                registryView.setText(Integer.toString(currentResultInt));
             }
 
-            if (Double.parseDouble(currentInput) == 0 && lastOp == '/'){
+            registryView.setText(registryView.getText() + " " + lastOp);
+        } catch (NumberFormatException e){
+            currentInputView.setText("Invalid input");
+            displayingResult = true;
+            return;
+        }
+    }
+
+    private void finalizeResult(){
+        try {
+            if (Double.parseDouble((String) currentInputView.getText()) == 0 && lastOp == '/'){
                 currentInputView.setText("You can't divide by zero!");
                 displayingResult = true;
                 return;
             }
-
-            if (floatingPoint){
-                performOperationDouble(lastOp);
-            }
-            else {
-                performOperationInt(lastOp);
-            }
-        }
-
-        if (firstOp) firstOp = false;
-
-        lastOp = op;
-        currentInputView.setText("");
-
-        if (floatingPoint){
-            registryView.setText(Double.toString(currentResultDouble));
-        }
-        else {
-            registryView.setText(Integer.toString(currentResultInt));
-        }
-
-        registryView.setText(registryView.getText() + " " + lastOp);
-    }
-
-    private void finalizeResult(){
-        if (Double.parseDouble((String) currentInputView.getText()) == 0 && lastOp == '/'){
-            currentInputView.setText("You can't divide by zero!");
+        } catch (NumberFormatException e) {
+            currentInputView.setText("Invalid input");
             displayingResult = true;
             return;
         }
